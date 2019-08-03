@@ -13,16 +13,16 @@ public class TextInThreads {
     public static void main(String[] args) throws FileNotFoundException, InterruptedException {
         final ExecutorService readService = Executors.newFixedThreadPool(1);
         final ExecutorService writeService = Executors.newFixedThreadPool(5);
-        SynchronousQueue<String> queue = new SynchronousQueue<>();
+        final SynchronousQueue<String> queue = new SynchronousQueue<>();
         final String path = "/Users/maksimsadovnikov/IdeaProjects/PingPongTask" +
                 "/src/main/java/ru/maxim/Latin-Lipsum.txt";
 //        Thread readThread = new Thread(new ReadFromThread(queue, path));
 //        readThread.start();
         readService.submit(new ReadFromThread(queue, path));
         Thread.sleep(1000);
-        while (!queue.isEmpty()) {
-            writeService.submit(new WriteFromThread(queue));
-        }
+//        while (!queue.isEmpty()) {
+//            writeService.submit(new WriteFromThread(queue));
+//        }
         readService.shutdown();
         writeService.shutdown();
     }
@@ -43,6 +43,7 @@ class ReadFromThread implements Runnable {
         while (scanner.hasNext()) {
             try {
                 queue.put(scanner.next());
+                System.out.println(scanner.next());
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
