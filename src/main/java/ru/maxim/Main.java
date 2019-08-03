@@ -9,9 +9,9 @@ public class Main {
         Executor executor = Executors.newFixedThreadPool(2);
         CompletableFuture<Void> ping = CompletableFuture.runAsync(() ->
                 System.out.println("ping"), executor);
-        CompletableFuture<Void> pong = CompletableFuture.runAsync(() -> System.out.println("pong"), executor);
+        CompletableFuture<Void> pong = CompletableFuture.runAsync(() ->
+                System.out.println("pong"), executor);
 
-//        CompletableFuture<Void> future = CompletableFuture.allOf()
     }
 
 }
