@@ -8,17 +8,20 @@ public class Message implements Runnable {
 
     private static final int N = 10;
     private Thread thread;
+    int i;
     private static Object object = new Object();
 
     public Message(String name){
         thread = new Thread(this, name);
         thread.start();
+        i = 0;
     }
 
     public void run(){
-        for(int i=0; i<N; i++){
+        while (i < N){
             synchronized (object) {
                 System.out.println(i + "\t" + thread.getName());
+                i++;
                 object.notify();
                 try {
                     object.wait();
