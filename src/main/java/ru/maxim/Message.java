@@ -8,10 +8,10 @@ public class Message implements Runnable {
 
     private static final int N = 10;
     private Thread thread;
-    int i;
-    private static Object object = new Object();
+    private int i;
+    private static final Object object = new Object();
 
-    public Message(String name){
+    private Message(String name){
         thread = new Thread(this, name);
         thread.start();
         i = 0;
@@ -32,7 +32,7 @@ public class Message implements Runnable {
         }
     }
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) {
         Thread message1 = new Thread(new Message("Ping"));
         Thread message2 = new Thread(new Message("Pong"));
     }

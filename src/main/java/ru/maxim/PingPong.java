@@ -4,17 +4,18 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 class PingPong implements Runnable {
-    int N = 30, i;
-    String word;
-    private static Object object = new Object();
+    private int i;
+    private String word;
+    private static final Object object = new Object();
 
-    PingPong(String s) {
+    private PingPong(String s) {
         word = s;
         i = 0;
     }
 
     public void run() {
-         do {
+        int n = 30;
+        do {
             synchronized (object) {
                 System.out.println(word + i);
                 object.notifyAll();
@@ -22,10 +23,10 @@ class PingPong implements Runnable {
                     object.wait();
                 } catch (InterruptedException e) { break; }
             }
-        } while (i++ < N);
+        } while (i++ < n);
     }
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) {
         ExecutorService service = Executors.newFixedThreadPool(2);
         service.submit(new PingPong("| ping\t\t |"));
         service.submit(new PingPong("| \t\tpong |"));

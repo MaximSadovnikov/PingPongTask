@@ -22,11 +22,11 @@ class Foo {
 class TaskForThread implements Runnable {
 
     private static final AtomicInteger atomicInteger = new AtomicInteger(0);
-    public static int value = 0;
-    String string;
-    boolean signPlus;
+    private static int value = 0;
+    private String string;
+    private boolean signPlus;
 
-    public TaskForThread(String s, boolean sign) {
+    TaskForThread(String s, boolean sign) {
         this.string = s;
         this.signPlus = sign;
     }

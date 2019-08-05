@@ -20,7 +20,9 @@ public class TextInThreads {
         WriteFromThread writer = new WriteFromThread(queue);
         AtomicInteger i = new AtomicInteger(0);
         readService.submit(reader);
-        while (queue.isEmpty()){Thread.sleep(1);}
+        while (queue.isEmpty()) {
+            Thread.sleep(1);
+        }
         while (!queue.isEmpty()) {
             writeService.submit(writer);
         }
@@ -33,12 +35,10 @@ class ReadFromThread implements Runnable {
 
     private final Scanner scanner;
     private Queue<String> queue;
-    public volatile Boolean isRunning;
 
-    public ReadFromThread(Queue<String> queue, String path) throws FileNotFoundException {
+    ReadFromThread(Queue<String> queue, String path) throws FileNotFoundException {
         this.queue = queue;
         this.scanner = new Scanner(new File(path));
-        this.isRunning = new Boolean(true);
     }
 
     @Override
@@ -51,7 +51,6 @@ class ReadFromThread implements Runnable {
         } catch (InterruptedException e) {
             return;
         }
-        this.isRunning = new Boolean(false);
         Thread.currentThread().interrupt();
     }
 }
@@ -61,7 +60,7 @@ class WriteFromThread implements Runnable {
     private Queue<String> queue;
     private final AtomicInteger index = new AtomicInteger(0);
 
-    public WriteFromThread(Queue<String> queue) {
+    WriteFromThread(Queue<String> queue) {
         this.queue = queue;
     }
 
@@ -73,7 +72,6 @@ class WriteFromThread implements Runnable {
                     (index.get()),
                     Thread.currentThread().getName(),
                     queue.poll());
-
         }
     }
 }
