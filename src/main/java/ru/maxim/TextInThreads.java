@@ -1,24 +1,35 @@
 package ru.maxim;
 
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.URL;
 import java.util.Queue;
 import java.util.Scanner;
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/*
+TODO:
+    Делать ожидание за счет проверки раз в секунду очень плохая практика,
+        стоит воспользоваться примитивом синхронизации
+    который не будет будить поток лишний раз и сработает сразу по наступлению
+        события а не через секунду
+    это я про всякие Thread.sleep(1);
+    Latin-Lipsum.txt следует положить в ресурсы и читать через Class::getResource +
+*/
+
 public class TextInThreads {
-    public static void main(String[] args) throws FileNotFoundException, InterruptedException {
+    public static void main(String[] args) throws IOException, InterruptedException {
         final ExecutorService readService = Executors.newFixedThreadPool(1);
         final ExecutorService writeService = Executors.newFixedThreadPool(5);
         final Queue<String> queue = new ConcurrentLinkedQueue<>();
         // write your path
-        final String path = "/Users/maksimsadovnikov/IdeaProjects/PingPongTask" +
-                "/src/main/java/ru/maxim/Latin-Lipsum.txt";
-        Scanner scanner = new Scanner(new File(path));
+        final URL path = TextInThreads.class.getResource("/Latin-Lipsum.txt");
+//        final String path = "/Users/maksimsadovnikov/IdeaProjects/PingPongTask" +
+//                "/src/main/java/ru/maxim/Latin-Lipsum.txt";
         ReadFromThread reader = new ReadFromThread(queue, path);
         WriteFromThread writer = new WriteFromThread(queue);
-        AtomicInteger i = new AtomicInteger(0);
         readService.submit(reader);
         while (queue.isEmpty()) {
             Thread.sleep(1);
@@ -36,9 +47,9 @@ class ReadFromThread implements Runnable {
     private final Scanner scanner;
     private Queue<String> queue;
 
-    ReadFromThread(Queue<String> queue, String path) throws FileNotFoundException {
+    ReadFromThread(Queue<String> queue, URL path) throws IOException {
         this.queue = queue;
-        this.scanner = new Scanner(new File(path));
+        this.scanner = new Scanner(path.openStream());
     }
 
     @Override
@@ -46,12 +57,6 @@ class ReadFromThread implements Runnable {
         while (scanner.hasNext()) {
             queue.add(scanner.next());
         }
-        try {
-            Thread.sleep(1);
-        } catch (InterruptedException e) {
-            return;
-        }
-        Thread.currentThread().interrupt();
     }
 }
 

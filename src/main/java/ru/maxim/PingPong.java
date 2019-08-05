@@ -1,16 +1,32 @@
 package ru.maxim;
 
+import org.omg.CORBA.TIMEOUT;
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+
+/*
+TODO:
+    spurious wakeups
+    порядок не гарантирован, может сначала напечатать pong
+    последний поток остается "навечно" висящим и ожидающим пока кто-то сделает notify
+ */
 class PingPong implements Runnable {
+    private static final Object object = new Object();
     private int i;
     private String word;
-    private static final Object object = new Object();
 
     private PingPong(String s) {
         word = s;
         i = 0;
+    }
+
+    public static void main(String[] args) {
+        ExecutorService service = Executors.newFixedThreadPool(2);
+        service.execute(new PingPong("| ping\t\t |"));
+        service.execute(new PingPong("| \t\tpong |"));
+        service.shutdown();
     }
 
     public void run() {
@@ -20,16 +36,11 @@ class PingPong implements Runnable {
                 System.out.println(word + i);
                 object.notifyAll();
                 try {
-                    object.wait();
-                } catch (InterruptedException e) { break; }
+                    object.wait(10); // добавил timeout, теперь через 10 милисекунду выходит
+                } catch (InterruptedException e) {
+                    break;
+                }
             }
         } while (i++ < n);
-    }
-
-    public static void main(String[] args) {
-        ExecutorService service = Executors.newFixedThreadPool(2);
-        service.submit(new PingPong("| ping\t\t |"));
-        service.submit(new PingPong("| \t\tpong |"));
-        service.shutdown();
     }
 }
