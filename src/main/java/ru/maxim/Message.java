@@ -22,20 +22,18 @@ public class Message implements Runnable {
             synchronized (object) {
                 System.out.println(i + "\t" + thread.getName());
                 i++;
-                object.notify();
+                object.notifyAll();
                 try {
                     object.wait();
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    break;
                 }
             }
         }
     }
 
     public static void main(String[] args) throws InterruptedException {
-        ExecutorService service = Executors.newFixedThreadPool(2);
         Thread message1 = new Thread(new Message("Ping"));
         Thread message2 = new Thread(new Message("Pong"));
-        service.shutdown();
     }
 }
