@@ -54,8 +54,6 @@ class Ping implements Runnable {
         this.N = N;
     }
 
-    // standard constructor
-
     @Override
     public void run() {
         for (int i = 0; i <= N; i++) {
@@ -73,7 +71,6 @@ class Pong implements Runnable {
         this.N = N;
     }
 
-    // standard constructors
     @Override
     public void run() {
         for (int i = 0; i <= N; i++) {

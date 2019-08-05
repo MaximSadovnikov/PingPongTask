@@ -3,6 +3,7 @@ package ru.maxim;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /*
 TODO:
@@ -11,7 +12,9 @@ TODO:
 */
 
 public class Main {
+
     public static void main(String[] args) throws Exception{
+        AtomicInteger i = new AtomicInteger(0);
         ExecutorService service = Executors.newFixedThreadPool(2);
         CompletableFuture<Void> ping = CompletableFuture.runAsync(() ->
                 System.out.println("ping"), service);

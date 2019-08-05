@@ -1,7 +1,5 @@
 package ru.maxim;
 
-import org.omg.CORBA.TIMEOUT;
-
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -36,7 +34,7 @@ class PingPong implements Runnable {
                 System.out.println(word + i);
                 object.notifyAll();
                 try {
-                    object.wait(10); // добавил timeout, теперь через 10 милисекунду выходит
+                    object.wait(10);
                 } catch (InterruptedException e) {
                     break;
                 }

@@ -4,9 +4,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Queue;
 import java.util.Scanner;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /*
@@ -23,17 +21,14 @@ public class TextInThreads {
     public static void main(String[] args) throws IOException, InterruptedException {
         final ExecutorService readService = Executors.newFixedThreadPool(1);
         final ExecutorService writeService = Executors.newFixedThreadPool(5);
+        final CountDownLatch countDownLatch = new CountDownLatch(1);
         final Queue<String> queue = new ConcurrentLinkedQueue<>();
-        // write your path
         final URL path = TextInThreads.class.getResource("/Latin-Lipsum.txt");
-//        final String path = "/Users/maksimsadovnikov/IdeaProjects/PingPongTask" +
-//                "/src/main/java/ru/maxim/Latin-Lipsum.txt";
-        ReadFromThread reader = new ReadFromThread(queue, path);
+
+        ReadFromThread reader = new ReadFromThread(queue, path, countDownLatch);
         WriteFromThread writer = new WriteFromThread(queue);
         readService.submit(reader);
-        while (queue.isEmpty()) {
-            Thread.sleep(1);
-        }
+        countDownLatch.await();
         while (!queue.isEmpty()) {
             writeService.submit(writer);
         }
@@ -46,16 +41,19 @@ class ReadFromThread implements Runnable {
 
     private final Scanner scanner;
     private Queue<String> queue;
+    private CountDownLatch countDownLatch;
 
-    ReadFromThread(Queue<String> queue, URL path) throws IOException {
+    ReadFromThread(Queue<String> queue, URL path, CountDownLatch countDownLatch) throws IOException {
         this.queue = queue;
         this.scanner = new Scanner(path.openStream());
+        this.countDownLatch = countDownLatch;
     }
 
     @Override
     public void run() {
         while (scanner.hasNext()) {
             queue.add(scanner.next());
+            countDownLatch.countDown();
         }
     }
 }
@@ -73,7 +71,7 @@ class WriteFromThread implements Runnable {
     public void run() {
         if (queue.peek() != null) {
             index.incrementAndGet();
-            System.out.format("%4d\t\t\t%s\t\t\t%s\n",
+            System.out.format("%4d %20s %20s\n",
                     (index.get()),
                     Thread.currentThread().getName(),
                     queue.poll());
