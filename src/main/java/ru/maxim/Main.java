@@ -25,3 +25,12 @@ public class Main {
         service.shutdown();
     }
 }
+
+//class Writer implements Runnable{
+//
+//    String string;
+//    @Override
+//    public void run() {
+//        System.out.println(string);
+//    }
+//}
